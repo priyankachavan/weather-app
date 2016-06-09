@@ -29,6 +29,14 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.example.priyanka.testproject.Home" />
         </activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/title_activity_settings"
+            android:parentActivityName=".Home"
+            >
+            <meta-data android:name="android.support.PARENT_ACTIVITY"
+                android:value="com.example.priyanka.testproject.Home"/>
+        </activity>
     </application>
 
 </manifest>

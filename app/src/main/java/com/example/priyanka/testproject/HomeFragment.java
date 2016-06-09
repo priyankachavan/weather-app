@@ -1,7 +1,10 @@
 package com.example.priyanka.testproject;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -37,23 +40,7 @@ public class HomeFragment extends Fragment {
     public HomeFragment() {
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-
-            FetchWeatherTask weatherTask= new FetchWeatherTask();
-            weatherTask.execute();
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -76,18 +63,36 @@ public class HomeFragment extends Fragment {
 
         ListView listView=(ListView)rootView.findViewById(R.id.ListViewForecast);
         listView.setAdapter(weatherListAdapter);
-        FetchWeatherTask weatherTask= new FetchWeatherTask();
-        weatherTask.execute("1259229");
+
+        // this is executed when new location is selectec
+        updateWeather();
+       // FetchWeatherTask weatherTask= new FetchWeatherTask();
+       // weatherTask.execute("1259229");
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 String foreCast=weatherListAdapter.getItem(position).toString();
-                Toast.makeText(getActivity(),foreCast,Toast.LENGTH_SHORT).show();
-
+                Intent intent=new Intent(getActivity(),DetailActivity.class).putExtra(Intent.EXTRA_TEXT,foreCast);
+                startActivity(intent);
             }
         });
         return rootView;
     }
+
+    private void updateWeather() {
+        HomeFragment.FetchWeatherTask weatherTask = new HomeFragment.FetchWeatherTask();
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        String location = prefs.getString(getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default));
+        weatherTask.execute(location);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        updateWeather();
+    }
+
     public class FetchWeatherTask extends AsyncTask<String,Void,String[]>{
         private final  String LOG_CAT=FetchWeatherTask.class.getSimpleName();
 
